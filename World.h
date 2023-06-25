@@ -3,44 +3,44 @@
 #include <SFML/Graphics.hpp>
 #include "Paddle.h"
 #include "Ball.h"
-#include "Util.h"
-
-class Paddle;
-class Ball;
+#include "Constants.h"
 
 class World
 {
-private:
-	Paddle left_paddle;
-	Paddle right_paddle;
-	Ball ball;
-
 public:
+	Paddle m_LeftPaddle;
+	Paddle m_RightPaddle;
+	Ball m_Ball;
+	
 	World() = default;
 
 	void init()
 	{
-		left_paddle.init(PADDLE_SIZE, Paddle::Side::LEFT, *this);
-		left_paddle.setPosition(GUTTER, VIRTUAL_SIZE.y - left_paddle.getSize().y - V_GAP);
+		m_LeftPaddle.init(PADDLE_SIZE, Paddle::Side::LEFT, *this);
+		m_LeftPaddle.setPosition(GUTTER, VIRTUAL_SIZE.y - m_LeftPaddle.getSize().y - V_GAP);
 
-		right_paddle.init(PADDLE_SIZE, Paddle::Side::RIGHT, *this);
-		right_paddle.setPosition(VIRTUAL_SIZE.x - GUTTER - right_paddle.getSize().x, V_GAP);
+		m_RightPaddle.init(PADDLE_SIZE, Paddle::Side::RIGHT, *this);
+		m_RightPaddle.setPosition(VIRTUAL_SIZE.x - GUTTER - m_RightPaddle.getSize().x, V_GAP);
 
-		ball.init(sf::Vector2f(40, 40), 700, *this);
-		ball.setPosition(VIRTUAL_SIZE.x / 2 - ball.getSize().x / 2, VIRTUAL_SIZE.y / 2 - ball.getSize().y / 2);
+		m_Ball.init(sf::Vector2f(40, 40), 700, *this);
+		m_Ball.setPosition(
+			VIRTUAL_SIZE.x / 2 - m_Ball.getSize().x / 2,
+			VIRTUAL_SIZE.y / 2 - m_Ball.getSize().y / 2
+		);
 	}
 
 	void update(const sf::Time& dt)
 	{
-		left_paddle.update(dt);
-		right_paddle.update(dt);
-		ball.update(dt);
+		m_LeftPaddle.update(dt);
+		m_RightPaddle.update(dt);
+		m_Ball.update(dt);
 	}
 
 	void render(sf::RenderWindow& window)
 	{
-		window.draw(left_paddle);
-		window.draw(right_paddle);
-		window.draw(ball);
+		window.draw(m_LeftPaddle);
+		window.draw(m_RightPaddle);
+		window.draw(m_Ball);
 	}
 };
+

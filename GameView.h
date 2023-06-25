@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <numeric>
 
 struct AspectRatio
 {
@@ -19,7 +20,9 @@ public:
 	GameView(const sf::Vector2u& v_size, const sf::Vector2u& win_size)
 	: sf::View(sf::FloatRect(0, 0, v_size.x, v_size.y))
 	{
-		m_Ratio = {(float) v_size.x, (float) v_size.y};
+		float gcd = std::gcd(v_size.x, v_size.y);
+
+		m_Ratio = {v_size.x / gcd, v_size.y / gcd};
 		m_AR = m_Ratio.x / m_Ratio.y;
 		m_ARInverted = m_Ratio.y / m_Ratio.x;
 

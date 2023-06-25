@@ -12,9 +12,3 @@ const float GUTTER = 120;
 const float V_GAP = 200;
 const float P_SPEED = 1500;
 
-int gcf(int a, int b)
-{
-	if (a == 0) return b;
-	return gcf(b % a, a);
-}
-
