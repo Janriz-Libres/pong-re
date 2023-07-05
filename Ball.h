@@ -1,38 +1,42 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "Hud.h"
 
 class World;
 
 class Ball : public sf::RectangleShape
 {
 private:
-	float m_Speed = 0;
+	static constexpr float INIT_SPEED = 900;
+	static constexpr float HIT_SPEED = 1400;
+	static constexpr float SPEED_UP = 1.05;
+
 	sf::Vector2f m_Velocity;
 	World* m_World = nullptr;
-
-	void copy(const Ball&);
+	float m_Speed = 0;
+	bool m_FirstHit = true;
 
 	void normalize();
+
+	void reset();
 
 	void initializeVelocity();
 
 	void handleBorderCollisions();
 
+	void checkForScores(Hud& hud);
+
 public:
 	Ball() = default;
 
-	Ball(const sf::Vector2f&, float, World&);
+	Ball(const sf::Vector2f&, World&);
 
-	Ball(const Ball&);
+	void init(const sf::Vector2f&, World&);
 
-	~Ball();
+	void update(const sf::Time&, Hud& hud);
 
-	Ball& operator=(const Ball&);
+	void setVelocity(float, float);
 
-	void init(const sf::Vector2f&, float, World&);
-
-	void setVelocityByInversion(bool, bool);
-
-	void update(const sf::Time&);
+	sf::Vector2f getVelocity();
 };

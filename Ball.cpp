@@ -1,67 +1,63 @@
 #include <cstdlib>
 #include <cmath>
+#include <iostream>
 
 #include "World.h"
+#include "Paddle.h"
 #include "Ball.h"
 #include "Constants.h"
+#include "Hud.h"
 
 // Constructors / Destructors
 
-Ball::Ball(const sf::Vector2f& size, float speed, World& world)
-: sf::RectangleShape(size), m_Speed(speed), m_World(&world)
+Ball::Ball(const sf::Vector2f& size, World& world)
+: sf::RectangleShape(size), m_Speed(INIT_SPEED), m_World(&world)
 {
 	initializeVelocity();
-}
-
-Ball::Ball(const Ball& other)
-{
-	copy(other);
-}
-
-Ball::~Ball()
-{
-	delete m_World;
 }
 
 // Public Methods
 
-Ball& Ball::operator=(const Ball& other)
-{
-	copy(other);
-	return *this;
-}
-
-void Ball::init(const sf::Vector2f& size, float speed, World& world)
+void Ball::init(const sf::Vector2f& size, World& world)
 {
 	setSize(size);
-	m_Speed = speed;
+	m_Speed = INIT_SPEED;
 	m_World = &world;
 	initializeVelocity();
 }
 
-void Ball::setVelocityByInversion(bool invertX, bool invertY)
-{
-	m_Velocity.x *= invertX ? -1 : 1;
-	m_Velocity.y *= invertY ? -1 : 1;
-}
-
-void Ball::update(const sf::Time& dt)
+void Ball::update(const sf::Time& dt, Hud& hud)
 {
 	move(m_Velocity * m_Speed * dt.asSeconds());
 	handleBorderCollisions();
+	checkForScores(hud);
+}
+
+// Setters / Getters
+
+void Ball::setVelocity(float x, float y)
+{
+	m_Velocity.x = x;
+	m_Velocity.y = y;
+	normalize();
+	
+	if (m_FirstHit)
+	{
+		m_Speed = HIT_SPEED;
+		m_FirstHit = false;
+	}
+	else
+	{
+		m_Speed *= SPEED_UP;
+	}
+}
+
+sf::Vector2f Ball::getVelocity()
+{
+	return m_Velocity;
 }
 
 // Private Methods
-
-void Ball::copy(const Ball& other)
-{
-	m_Speed = other.m_Speed;
-	m_Velocity = other.m_Velocity;
-
-	delete m_World;
-	m_World = new World;
-	*m_World = *other.m_World;
-}
 
 void Ball::normalize()
 {
@@ -72,16 +68,57 @@ void Ball::normalize()
 	m_Velocity.y /= magnitude;
 }
 
+void Ball::reset()
+{
+	setPosition(
+		VIRTUAL_SIZE.x / 2 - getSize().x / 2,
+		VIRTUAL_SIZE.y / 2 - getSize().y / 2
+	);
+	initializeVelocity();
+
+	m_FirstHit = true;
+	m_Speed = INIT_SPEED;
+}
+
 void Ball::initializeVelocity()
 {
 	m_Velocity.x = -1 + rand() / ((float) RAND_MAX / 2);
-	m_Velocity.y = -1 + rand() / ((float) RAND_MAX / 2);
+
+	float tmp_y = rand() / ((float) RAND_MAX / (m_Velocity.x * 2));
+	m_Velocity.y = rand() % 2 == 0 ? tmp_y : -tmp_y;
+
 	normalize();
 }
 
 void Ball::handleBorderCollisions()
 {
 	sf::Vector2f pos = getPosition();
-	if (pos.y < 0 || pos.y + getSize().y > VIRTUAL_SIZE.y) m_Velocity.y *= -1;
+	
+	if (pos.y < BORDER_OUTLINE)
+	{
+		m_Velocity.y *= -1;
+		setPosition(pos.x, BORDER_OUTLINE);
+	}
+	else if (pos.y + getSize().y > VIRTUAL_SIZE.y - BORDER_OUTLINE)
+	{
+		m_Velocity.y *= -1;
+		setPosition(pos.x, VIRTUAL_SIZE.y - BORDER_OUTLINE - getSize().y);
+	}
+}
+
+void Ball::checkForScores(Hud& hud)
+{
+	sf::Vector2f pos = getPosition();
+
+	if (pos.x + getSize().x < 0)
+	{
+		hud.incrementScore(Paddle::Side::RIGHT);
+		reset();
+	}
+	else if (pos.x > VIRTUAL_SIZE.x)
+	{
+		hud.incrementScore(Paddle::Side::LEFT);
+		reset();
+	}
 }
 

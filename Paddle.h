@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
+class Ball;
 class World;
 
 struct Keys
@@ -13,14 +14,36 @@ class Paddle : public sf::RectangleShape
 {
 public:
 	enum Side { LEFT, RIGHT };
+	static constexpr float GUTTER = 120;
+	static constexpr float V_GAP = 200;
 
 private:
+	static constexpr float WIDTH = 40;
+	static constexpr float HEIGHT = 250;
+	static constexpr float P_SPEED = 1500;
+
 	Side m_Side = LEFT;
+	Keys m_Keys;
 	World* m_World = nullptr;
 
-	void copy(const Paddle&);
+	bool m_PressedUp = false;
+	bool m_PressedDown = false;
 
-	void updateControllable(const sf::Time&, const Keys&);
+public:
+	Paddle() = default;
+
+	Paddle(const Side&, World&);
+
+	void init(const Side&, World&);
+
+	void process(const sf::Event event);
+
+	void update(const sf::Time&);
+
+private:
+	void initializeKeys();
+
+	void updateControllable(const sf::Time&);
 
 	void updateRightPaddle(const sf::Time&);
 
@@ -28,21 +51,8 @@ private:
 
 	void handleBallCollisions();
 
+	void handleSideCollisions(Ball& ball);
+
 	bool hasCollidedWithBall();
-
-public:
-	Paddle() = default;
-
-	Paddle(const sf::Vector2f&, const Side&, World&);
-
-	Paddle(const Paddle&);
-
-	~Paddle();
-
-	Paddle& operator=(const Paddle&);
-
-	void init(const sf::Vector2f&, const Side&, World&);
-
-	void update(const sf::Time&);
 };
 
