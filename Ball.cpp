@@ -2,11 +2,13 @@
 #include <cmath>
 #include <iostream>
 
-#include "World.h"
-#include "Paddle.h"
 #include "Ball.h"
-#include "Constants.h"
 #include "Hud.h"
+#include "World.h"
+#include "SoundManager.h"
+
+#include "Paddle.h"
+#include "Constants.h"
 
 // Constructors / Destructors
 
@@ -52,9 +54,14 @@ void Ball::setVelocity(float x, float y)
 	}
 }
 
-sf::Vector2f Ball::getVelocity()
+sf::Vector2f Ball::getVelocity() const
 {
 	return m_Velocity;
+}
+
+float Ball::getSpeed() const
+{
+	return m_Speed;
 }
 
 // Private Methods
@@ -98,11 +105,13 @@ void Ball::handleBorderCollisions()
 	{
 		m_Velocity.y *= -1;
 		setPosition(pos.x, BORDER_OUTLINE);
+		SoundManager::play("audio/beep.wav");
 	}
 	else if (pos.y + getSize().y > VIRTUAL_SIZE.y - BORDER_OUTLINE)
 	{
 		m_Velocity.y *= -1;
 		setPosition(pos.x, VIRTUAL_SIZE.y - BORDER_OUTLINE - getSize().y);
+		SoundManager::play("audio/beep.wav");
 	}
 }
 
@@ -112,11 +121,13 @@ void Ball::checkForScores(Hud& hud)
 
 	if (pos.x + getSize().x < 0)
 	{
+		SoundManager::play("audio/fire.wav");
 		hud.incrementScore(Paddle::Side::RIGHT);
 		reset();
 	}
 	else if (pos.x > VIRTUAL_SIZE.x)
 	{
+		SoundManager::play("audio/fire.wav");
 		hud.incrementScore(Paddle::Side::LEFT);
 		reset();
 	}

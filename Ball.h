@@ -1,8 +1,8 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Hud.h"
 
+class Hud;
 class World;
 
 class Ball : public sf::RectangleShape
@@ -25,7 +25,7 @@ private:
 
 	void handleBorderCollisions();
 
-	void checkForScores(Hud& hud);
+	void checkForScores(Hud&);
 
 public:
 	Ball() = default;
@@ -34,9 +34,11 @@ public:
 
 	void init(const sf::Vector2f&, World&);
 
-	void update(const sf::Time&, Hud& hud);
+	void update(const sf::Time&, Hud&);
 
 	void setVelocity(float, float);
 
-	sf::Vector2f getVelocity();
+	sf::Vector2f getVelocity() const;
+
+	float getSpeed() const;
 };

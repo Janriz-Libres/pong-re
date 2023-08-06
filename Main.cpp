@@ -6,6 +6,8 @@
 #include "GameView.h"
 #include "World.h"
 #include "Hud.h"
+#include "SoundManager.h"
+#include "Constants.h"
 
 int main()
 {
@@ -67,6 +69,7 @@ int main()
 						case MENU:
 							state = SCORED;
 							hud.resetScores();
+							SoundManager::play("audio/boop.wav");
 							break;
 						case PAUSED:
 							state = PLAY;
@@ -78,7 +81,10 @@ int main()
 				}
 
 				if (event.key.code == sf::Keyboard::Space && state == MENU)
+				{
 					hud.changeMode();
+					SoundManager::play("audio/confirmbeep.wav");
+				}
 
 				if (event.key.code == sf::Keyboard::Escape && state == GAME_OVER)
 				{

@@ -1,9 +1,13 @@
 #include <cmath>
 
-#include "World.h"
 #include "Paddle.h"
+#include "World.h"
 #include "Ball.h"
 #include "Constants.h"
+#include "SoundManager.h"
+
+const float Paddle::ACCELERATION = 3000;
+const float Paddle::FRICTION = 7000;
 
 // Constructors / Destructors
 
@@ -38,14 +42,14 @@ void Paddle::process(const sf::Event event)
 	}
 }
 
-void Paddle::update(const sf::Time& dt)
+void Paddle::update(const sf::Time& dt, const Ball& ball)
 {
 	switch (m_Side) {
 		case LEFT:
 			updateControllable(dt);
 			break;
 		case RIGHT:
-			updateRightPaddle(dt);
+			updateRightPaddle(dt, ball);
 	}
 
 	handleBoundaries();
@@ -72,9 +76,30 @@ void Paddle::updateControllable(const sf::Time& dt)
 	move(0, dir * P_SPEED * dt.asSeconds());
 }
 
-void Paddle::updateRightPaddle(const sf::Time& dt)
+void Paddle::updateRightPaddle(const sf::Time& dt, const Ball& ball)
 {
-	updateControllable(dt);
+	if (mode == DOUBLE) updateControllable(dt);
+	else updateAI(dt, ball);
+}
+
+void Paddle::updateAI(const sf::Time& dt, const Ball& ball)
+{
+	const float b_center = ball.getPosition().y + ball.getSize().y / 2;
+	const float p_center = getPosition().y + getSize().y / 2;
+	const sf::Vector2f b_final_vel = ball.getVelocity() * ball.getSpeed();
+
+	if (b_center < p_center)
+	{
+		m_DY -= 5000.f * dt.asSeconds();
+		m_DY = std::max(-std::abs(b_final_vel.y) - 200, m_DY);
+	}
+	else
+	{
+		m_DY += 5000.f * dt.asSeconds();
+		m_DY = std::min(std::abs(b_final_vel.y) + 200, m_DY);
+	}
+
+	move(0, m_DY * dt.asSeconds());
 }
 
 void Paddle::handleBoundaries()
@@ -82,14 +107,24 @@ void Paddle::handleBoundaries()
 	const sf::Vector2f pos = getPosition();
 	const sf::Vector2f size = getSize();
 
-	if (pos.y < BORDER_OUTLINE) setPosition(pos.x, 0);
-	if (pos.y + size.y > VIRTUAL_SIZE.y - BORDER_OUTLINE) setPosition(pos.x, VIRTUAL_SIZE.y - size.y);
+	if (pos.y < BORDER_OUTLINE)
+	{
+		m_DY = 0;
+		setPosition(pos.x, BORDER_OUTLINE);
+	}
+
+	if (pos.y + size.y > VIRTUAL_SIZE.y - BORDER_OUTLINE)
+	{
+		m_DY = 0;
+		setPosition(pos.x, VIRTUAL_SIZE.y - size.y - BORDER_OUTLINE);
+	}
 }
 
 void Paddle::handleBallCollisions()
 {
 	if (!hasCollidedWithBall()) return;
-
+	
+	SoundManager::play("audio/beep.wav");
 	Ball& ball = m_World->m_Ball;
 
 	const sf::Vector2f self_pos = getPosition();

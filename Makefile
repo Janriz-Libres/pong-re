@@ -6,7 +6,7 @@ LDLIBS := -lsfml-window -lsfml-graphics -lsfml-audio -lsfml-system
 
 SRCS := $(wildcard *.cpp)
 OBJS := $(patsubst %.cpp, %.o, $(SRCS))
-EXEC := sfml-app
+EXEC := pong
 
 all: $(EXEC)
 
