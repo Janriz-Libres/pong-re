@@ -30,7 +30,7 @@ private:
 	static constexpr float TOP_MARGIN = 100;
 
 	static constexpr float T_SCORE = 1;
-	static const unsigned int MAX_SCORE = 1;
+	static const unsigned int MAX_SCORE = 5;
 
 	void initializeText(sf::Text&, const std::string&, unsigned int, float, float = 0);
 
