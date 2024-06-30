@@ -1,9 +1,9 @@
 <div align="center">
-  <h3 align="center">Pong Clone Game</h3>
+  <h3 align="center">Pong: Re</h3>
 
   <div align="justify">
     <p>
-      This application is a classic Pong clone developed in C++ using the SFML library. It offers two modes: play against an AI opponent or in a 2-player mode. Enjoy smooth gameplay with enhanced graphics.
+      A classic Pong clone developed in C++ using the SFML library. It offers two modes: play against an AI opponent or in a 2-player mode. Enjoy smooth gameplay with enhanced graphics.
     </p>
   </div>
 </div>
